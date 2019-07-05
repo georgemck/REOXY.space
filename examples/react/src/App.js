@@ -7,6 +7,11 @@ import ledgerProvider from 'eos-transit-ledger-provider'
 import lynxProvider from 'eos-transit-lynx-provider';
 import meetoneProvider from 'eos-transit-meetone-provider';
 import tokenpocketProvider from 'eos-transit-tokenpocket-provider';
+import whalevaultProvider from 'eos-transit-whalevault-provider'
+import simpleosProvider from 'eos-transit-simpleos-provider'
+import keycatProvider from 'eos-transit-keycat-provider'
+// import portisProvider from 'eos-transit-portis-provider'
+
 dotenv.config();
 
 let chainNetworkForExample = 'eos_kylin';
@@ -22,11 +27,16 @@ const {
 
 let eosTransitWalletProviders = [
   scatterProvider(),
-  // ledgerProvider(), 
   ledgerProvider({ pathIndexList: [ 0, 1, 2, 35 ] }),
   lynxProvider(),
   meetoneProvider(),
   tokenpocketProvider(),
+  whalevaultProvider(),
+  simpleosProvider(),
+  keycatProvider(),
+  // portisProvider({
+  //   DappId: 'ENTER_YOUR_DappId_HERE'
+  // }),
 ]
 
 class App extends Component {
@@ -114,12 +124,13 @@ async handleLogin(provider) {
     this.clearErrors();
     let loginResponse = await this.oreId.login({ provider, chainNetwork });
     //if the login responds with a loginUrl, then redirect the browser to it to start the user's OAuth login flow
-    let { isLoggedIn, account, loginUrl } = loginResponse;
+    console.info('loginResponse-->', loginResponse)
+    let { isLoggedIn, loginUrl } = loginResponse;
     if(loginUrl) {
       //redirect browser to loginURL
       window.location = loginUrl;
     }
-    this.setState({userInfo: {accountName:account}, isLoggedIn:isLoggedIn});
+    this.setState({ userInfo: loginResponse, isLoggedIn });
   } catch (error) {
     this.setState({errorMessage:error.message});
   }
@@ -278,11 +289,15 @@ renderSigningOptions() {
 renderDiscoverOptions() {
   let chainNetwork = chainNetworkForExample;
   this.walletButtons = [
-    {provider:'scatter', chainNetwork},
-    {provider:'ledger', chainNetwork},
-    {provider:'lynx', chainNetwork},
-    {provider:'meetone', chainNetwork},
-    {provider:'tokenpocket', chainNetwork}
+    { provider: 'scatter', chainNetwork },
+    { provider: 'ledger', chainNetwork },
+    { provider: 'lynx', chainNetwork },
+    { provider: 'meetone', chainNetwork },
+    { provider: 'tokenpocket', chainNetwork },
+    { provider: 'portis', chainNetwork },
+    { provider: 'whalevault', chainNetwork },
+    { provider: 'simpleos', chainNetwork },
+    { provider: 'keycat', chainNetwork }
   ];
   return (
     <div>
@@ -390,6 +405,26 @@ renderLoginButtons() {
           buttonStyle={{width:250, marginTop:'24px'}}
           logoStyle={{marginLeft:0}}
           onClick={()=>this.handleLogin("lynx")}
+      />
+      <LoginButton provider='portis'
+          buttonStyle={{width:250, marginTop:'24px'}}
+          logoStyle={{marginLeft:0}}
+          onClick={()=>this.handleLogin("portis")}
+      />
+      <LoginButton provider='whalevault'
+          buttonStyle={{width:250, marginTop:'24px'}}
+          logoStyle={{marginLeft:0}}
+          onClick={()=>this.handleLogin("whalevault")}
+      />
+      <LoginButton provider='simpleos'
+          buttonStyle={{width:250, marginTop:'24px'}}
+          logoStyle={{marginLeft:0}}
+          onClick={()=>this.handleLogin("simpleos")}
+      />
+      <LoginButton provider='keycat'
+          buttonStyle={{width:250, marginTop:'24px'}}
+          logoStyle={{marginLeft:0}}
+          onClick={()=>this.handleLogin("keycat")}
       />
     </div>
   )
